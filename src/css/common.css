@@ -45,6 +45,11 @@ button{
 .label{
   text-transform: uppercase;
 }
-.form button{
-  width: 100px;
+.form button {
+  width: 160px;
+  margin-left: 20px;
+}
+
+.form input {
+  padding: 6px;
 }
