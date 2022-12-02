@@ -509,13 +509,16 @@ var _flatpickrDefault = parcelHelpers.interopDefault(_flatpickr);
 var _flatpickrMinCss = require("flatpickr/dist/flatpickr.min.css");
 var _notiflixNotifyAio = require("notiflix/build/notiflix-notify-aio");
 const btnStart = document.querySelector("button[data-start]");
+const btnRst = document.querySelector("button[data-reset]");
 const days = document.querySelector("[data-days");
 const hours = document.querySelector("[data-hours");
 const minutes = document.querySelector("[data-minutes");
 const seconds = document.querySelector("[data-seconds");
 const insertData = document.querySelector('input[type="text"]');
 let selectedTime = 0;
+let tempSelectionTime = 0;
 btnStart.setAttribute("disabled", true);
+btnRst.setAttribute("disabled", true);
 let currentTime = new Date;
 let currTime = convertMs(currentTime.getTime());
 const options = {
@@ -524,15 +527,19 @@ const options = {
     defaultDate: new Date(),
     minuteIncrement: 1,
     onClose (selectedDates) {
-        // console.log(selectedDates[0].getTime());
-        // console.log(currentTime);
-        selectedTime = selectedDates[0].getTime();
-        // const tempTime = convertMs(selectedTime)
-        if (selectedTime - currentTime.getTime() <= 0) {
-            btnStart.setAttribute("disabled", true);
-            (0, _notiflixNotifyAio.Notify).failure("Please choose a date in the future");
-        //window.alert("Please choose a date in the future");
-        } else btnStart.removeAttribute("disabled");
+        tempSelectionTime = selectedDates[0].getTime();
+        //console.log(tempSelectionTime)
+        btnRst.setAttribute("disabled", true);
+        if (tempSelectionTime - currentTime.getTime() <= 0 && statusInterval == true) (0, _notiflixNotifyAio.Notify).failure("Please choose a date in the future");
+        else {
+            tempSelectionTime = selectedDates[0].getTime();
+            // const tempTime = convertMs(selectedTime)
+            if (tempSelectionTime - currentTime.getTime() <= 0) {
+                btnStart.setAttribute("disabled", true);
+                (0, _notiflixNotifyAio.Notify).failure("Please choose a date in the future");
+            //window.alert("Please choose a date in the future");
+            } else btnStart.removeAttribute("disabled");
+        }
     }
 };
 const setedData = (0, _flatpickrDefault.default)(insertData, options);
@@ -558,18 +565,25 @@ function convertMs(ms) {
     };
 }
 let updateTime;
+let statusInterval = false;
 btnStart.addEventListener("click", ()=>{
     btnStart.setAttribute("disabled", true);
     insertData.setAttribute("disabled", true);
+    btnRst.removeAttribute("disabled");
+    selectedTime = tempSelectionTime;
     updateTime = setInterval(()=>{
+        statusInterval = true;
         currentTime = new Date;
         currTime = convertMs(selectedTime - currentTime.getTime());
         days.textContent = addLeadingZero(currTime.days).padStart();
         hours.textContent = addLeadingZero(currTime.hours).padStart();
         minutes.textContent = addLeadingZero(currTime.minutes).padStart();
         seconds.textContent = addLeadingZero(currTime.seconds).padStart();
-        console.log(selectedTime - currentTime.getTime());
-        selectedTime - currentTime.getTime() <= 1000 && clearInterval(updateTime);
+        // console.log(selectedTime - currentTime.getTime());
+        if (selectedTime - currentTime.getTime() <= 1000) {
+            clearInterval(updateTime);
+            statusInterval = false;
+        }
     }, 1000);
 });
 const addLeadingZero = (value)=>{
@@ -579,6 +593,9 @@ const addLeadingZero = (value)=>{
     };
     return padStart();
 };
+btnRst.addEventListener("click", ()=>{
+    insertData.removeAttribute("disabled");
+});
 
 },{"flatpickr":"llQu5","flatpickr/dist/flatpickr.min.css":"eVN6V","notiflix/build/notiflix-notify-aio":"eXQLZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"llQu5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");

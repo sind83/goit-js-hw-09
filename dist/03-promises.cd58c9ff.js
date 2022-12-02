@@ -510,33 +510,46 @@ const amount = document.querySelector('[name="amount"]');
 const sendBtn = document.querySelector("button");
 let position = 1;
 function createPromise(position1, delay) {
-    const setInter = setInterval(()=>{
-        const shouldResolve = Math.random() > 0.3;
-        if (shouldResolve) {
-            // Fulfill
-            console.log(`✅ Fulfilled promise ${position1} in ${delay}ms`);
-            (0, _notiflix.Notify).success(`✅ Fulfilled promise ${position1} in ${delay}ms`);
-        } else {
-            // Reject
-            console.log(`❌ Rejected promise ${position1} in ${delay}ms`);
-            (0, _notiflix.Notify).failure(`❌ Rejected promise ${position1} in ${delay}ms`);
-        }
-        clearInterval(setInter);
-    }, delay);
+    return new Promise((resolve, reject)=>{
+        const setInter = setInterval(()=>{
+            const shouldResolve = Math.random() > 0.3;
+            if (shouldResolve) // Fulfill
+            resolve(success(`✅ Fulfilled promise ${position1} in ${delay}ms`));
+            else // Reject
+            reject(failure(`❌ Rejected promise ${position1} in ${delay}ms`));
+            clearInterval(setInter);
+        }, delay);
+    });
 }
+const success = (data)=>{
+    (0, _notiflix.Notify).success(data);
+    return data;
+};
+const failure = (data)=>{
+    (0, _notiflix.Notify).failure(data);
+    return data;
+};
+let promises = [];
 sendBtn.addEventListener("click", (event)=>{
     console.clear();
     event.preventDefault();
+    promises = [];
+    sendBtn.setAttribute("disabled", true);
     let qunatity = parseInt(amount.value);
     let stepTime = parseInt(step.value);
     let timeDelay = parseInt(delayTime.value);
     let delay = timeDelay;
     for(let i = 0; i < qunatity; i++){
-        createPromise(position, delay);
+        promises.push(createPromise(position, delay));
         delay = delay + stepTime;
         position++;
     }
     position = 1;
+    console.log(promises);
+    Promise.allSettled(promises).then((val)=>{
+        console.log(val);
+        sendBtn.removeAttribute("disabled");
+    });
 });
 
 },{"notiflix":"5WWYd"}],"5WWYd":[function(require,module,exports) {
