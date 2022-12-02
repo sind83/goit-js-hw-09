@@ -7,36 +7,55 @@ const sendBtn = document.querySelector('button');
 let position = 1;
 
 function createPromise(position, delay) {
-  const setInter = setInterval(() => {
-    const shouldResolve = Math.random() > 0.3;
-    if (shouldResolve) {
-      // Fulfill
-      console.log(`✅ Fulfilled promise ${position} in ${delay}ms`);
-      Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
-    } else {
-      // Reject
-      console.log(`❌ Rejected promise ${position} in ${delay}ms`);
-      Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
-    }
-   
-    clearInterval(setInter);
-  }, delay);
+  return new Promise((resolve, reject) => {
+    const setInter = setInterval(() => {
+      const shouldResolve = Math.random() > 0.3;
+      if (shouldResolve) {
+        // Fulfill
+        resolve(success(`✅ Fulfilled promise ${position} in ${delay}ms`));
+      } else {
+        // Reject
+        reject(failure(`❌ Rejected promise ${position} in ${delay}ms`));
+      }
+
+      clearInterval(setInter);
+    }, delay);
+  });
 }
 
+const success = (data) => {
+  Notify.success(data);
+  return data
+}
 
+const failure = (data) => {
+  Notify.failure(data);
+  return data;
+}
+
+let promises = [];
 sendBtn.addEventListener("click", (event) => {
   console.clear();
   event.preventDefault();
+  promises = [];
+  
+  sendBtn.setAttribute("disabled", true);
   let qunatity = parseInt(amount.value);
   let stepTime = parseInt(step.value);
   let timeDelay = parseInt(delayTime.value);
   let delay = timeDelay;
 
-    for (let i = 0; i < qunatity; i++) {
-      createPromise(position, delay);
-      delay = delay + stepTime;
-      position++;
-    }
+  for (let i = 0; i < qunatity; i++) {
+    promises.push(createPromise(position, delay));
+    delay = delay + stepTime;
+    position++;
+  }
   position = 1;
+  console.log(promises);
+  Promise.allSettled(promises)
+    .then((val) => {
+      console.log(val);
+      sendBtn.removeAttribute("disabled");
+    })
 
 });

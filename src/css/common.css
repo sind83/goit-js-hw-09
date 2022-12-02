@@ -53,3 +53,7 @@ button{
 .form input {
   padding: 6px;
 }
+.button-reset{
+  width: auto;
+  margin-left: 10px;
+}
